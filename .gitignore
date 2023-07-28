@@ -1,0 +1,12 @@
+node_modules
+puppeteer/*.png
+.env.development.local
+.env.development.local
+cypress/support/helpers/authentication/localstorage.config.json
+cypress.env.json
+chrome
+chrome-linux
+chrome-win
+chrome-linux.zip
+chrome-win.zip
+chrome.zip
