@@ -1,33 +1,75 @@
 # Run
+
 npx open cypress
 
 "cypress": "concurrently \"npm run dev\" \"cypress open\""
 npm i concurrently
 
 # Auto-completion
+
 `/// <reference types="Cypress" />`
 
-ou: 
+ou:
 https://docs.cypress.io/guides/tooling/IDE-integration#Writing-Tests
 ts:
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "types": ["cypress"]
-  },
-  "include": ["**/*.*"]
+"compilerOptions": {
+"allowJs": true,
+"types": ["cypress"]
+},
+"include": ["**/*.*"]
 }
 `
-# Selector
+
+# Selecting (queries)
 
 - `cy.get('img')` procura por todas as img
 - `cy.get("[alt='A list']")` procura pelo alt
 
-# get() x find()
+## get() x find()
+
 - Get after get doesn't not work, use find instead:
-`cy.get('.main-header').find('img')`
+  `cy.get('.main-header').find('img')`
+
+## contains()
+
+DOM elements can contain more than the desired text and still match.
+https://docs.cypress.io/api/commands/contains#Scopes
+
+- When starting a series of commands:
+  This queries the entire document for the content.
+
+`cy.contains('Log In')`
+
+- When chained to an existing series of commands
+  This will query inside of the <#checkout-container> element.
+
+`cy.get('#checkout-container').contains('Buy Now')`
+
+- Be wary of chaining multiple contains
+  Let's imagine a scenario where you click a button to delete a user and a dialog appears asking you to confirm this deletion.
+
+// This doesn't work as intended
+`cy.contains('Delete User').click().contains('Yes, Delete!').click()`
+
+What you want to do is call cy again, which automatically creates a new chain scoped to the document.
+`cy.contains('Delete User').click()`
+`cy.contains('Yes, Delete!').click()`
+
+## Element in order
+
+`cy.get('.task').first().contains("New Task");`
+`cy.get('.task').eq(0).contains("New Task");`
+
+`cy.get('.task').last().contains("New Task 2");`
+`cy.get('.task').eq(1).contains("New Task 2");`
 
 # User interaction
+
+`cy.get('#filter').select('moderate');`
+`cy.contains('Add Task').click();`
+`cy.get('#title').type('New Task');`
+
 It forces cypress to click in the backdrop, even if that is a textarea in front, but would causes a false positive, so will need a second check
 `cy.get('.backdrop').click({ force: true });`
 `cy.get('.backdrop').should('not.exist');`
