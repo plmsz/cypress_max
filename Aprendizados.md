@@ -56,6 +56,15 @@ What you want to do is call cy again, which automatically creates a new chain sc
 `cy.contains('Delete User').click()`
 `cy.contains('Yes, Delete!').click()`
 
+## data-\*
+
+Use data-\* attributes to provide context to your selectors and isolate them from CSS or JS changes.
+When determining a unique selector, it will automatically prefer elements with:
+
+data-cy
+data-test
+data-testid
+
 ## Element in order
 
 `cy.get('.task').first().contains("New Task");`
@@ -74,3 +83,9 @@ It forces cypress to click in the backdrop, even if that is a textarea in front,
 `cy.get('.backdrop').click({ force: true });`
 `cy.get('.backdrop').should('not.exist');`
 `cy.get('.modal').should('not.exist')`
+
+# Location
+
+`cy.location('pathname').should('eq','/about');`
+`cy.go("back");`
+// TODO: rEAD https://docs.cypress.io/guides/references/best-practices
