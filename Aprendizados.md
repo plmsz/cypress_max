@@ -65,8 +65,31 @@ data-cy
 data-test
 data-testid
 
-## Element in order
+## disabled
+cy.get('[data-cy="contact-btn-submit"]').should("be.disabled")
+cy.get('[data-cy="contact-btn-submit"]').should("not.be.disabled")
 
+cy.get('[data-cy="contact-btn-submit"]').should("not.have.attr", 'disabled')
+cy.get('[data-cy="contact-btn-submit"]').should(".have.attr", 'disabled')
+
+# Chain commands
+-  and = should
+ cy.get('[data-cy="contact-btn-submit"]')
+      .contains('Send Message')
+      .and('not.have.attr', 'disabled');
+
+# Alias
+cy.get('[data-cy="contact-btn-submit"]').as("submitBtn")
+    cy.get("@submitBtn").click();
+    cy.get("@submitBtn").contains('Sending...');
+
+# Then
+  cy.get('[data-cy="contact-btn-submit"]').then((el) => {
+      expect(el.attr('disabled')).to.be.undefined;
+      expect(el.text()).to.eq('Send Message')
+    });
+
+## Element in order
 `cy.get('.task').first().contains("New Task");`
 `cy.get('.task').eq(0).contains("New Task");`
 
@@ -84,8 +107,21 @@ It forces cypress to click in the backdrop, even if that is a textarea in front,
 `cy.get('.backdrop').should('not.exist');`
 `cy.get('.modal').should('not.exist')`
 
+# Special keys in type
+https://docs.cypress.io/api/commands/type#Arguments
+{esc}
+{enter}
+non native events on cypress : https://github.com/dmtrKovalenko/cypress-real-events
 # Location
 
 `cy.location('pathname').should('eq','/about');`
 `cy.go("back");`
+
+
+# Custom Comands
+Cypress.Commands.add("getByData", (selector) => {
+  return cy.get(`[data-test=${selector}]`)
+})
+
+
 // TODO: rEAD https://docs.cypress.io/guides/references/best-practices

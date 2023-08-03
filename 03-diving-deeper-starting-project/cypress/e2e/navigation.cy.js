@@ -6,7 +6,7 @@ describe('Page Navigation', () => {
     cy.go("back");
     cy.location('pathname').should('eq','/');
     cy.get('[data-cy="header-about-link"]').click();
-    cy.get('[data-cy="header-home-link"]').click();
+    cy.getByDataCy("header-home-link").click();
     cy.location('pathname').should('eq','/');
   });
 });
