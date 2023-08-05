@@ -118,6 +118,7 @@ cy.get('nav') // yields <nav>
   .should('have.css', 'font-family') // yields 'sans-serif'
   .and('match', /serif/) // yields 'sans-serif'
 
+### Change of subject
   cy.get('[data-cy="contact-input-name"]')
       .parent()
       .should('have.attr', 'class')
@@ -166,8 +167,60 @@ non native events on cypress : https://github.com/dmtrKovalenko/cypress-real-eve
 Cypress.Commands.add("getByData", (selector) => {
 return cy.get(`[data-test=${selector}]`)
 })
+Cypress.Commands.add('submitForm', () => {
+  cy.get('form button[type="submit"]').click();
+});
+Now a query is like a command, but one core difference is that it's a retryable function that can be retried
+by Cypress whilst it's, for example, is waiting for the visibily of the element. The difference is that queries are automatically retried by Cypress whereas commands are not (i.e., if the element is not found initially, Cypress will keep on searching).
 
-// TODO: rEAD https://docs.cypress.io/guides/references/best-practices
+Cypress.Commands.addQuery('getById', (id) => {
+const getFn = cy.now('get', `[data-cy="${id}"]`);
+  return () => {
+    return getFn();
+  };
+});
+
 
 # Screencshots
  cy.screenshot();
+
+ # Config
+ `https://docs.cypress.io/api/cypress-api/config
+
+ # Baseurl
+ import { defineConfig } from "cypress";
+
+export default defineConfig({
+  e2e: {
+    baseUrl: 'http://localhost:5173',
+    setupNodeEvents(on, config) {
+      // implement node event listeners here
+    },
+  },
+});`
+
+---
+`cy.visit('/about')`
+
+# Beforeeach, before, afterEach, after
+ beforeEach(() => {
+    //runs only once,before all test
+  })
+  beforeEach(() => {
+    //runs before each test
+    cy.visit('/about');
+  })
+
+// TODO: rEAD https://docs.cypress.io/guides/references/best-practices
+
+# task()
+https://docs.cypress.io/api/commands/task#Examples
+https://glebbahmutov.com/blog/powerful-cy-task/
+cy.task() provides an escape hatch for running arbitrary Node code, so you can take actions necessary for your tests outside of the scope of Cypress. This is great for:
+
+Read a file that might not exist
+Return number of files in the folder
+Seeding your test database.
+Storing state in Node that you want persisted between spec files.
+Performing parallel tasks, like making multiple http requests outside of Cypress.
+Running an external process.
