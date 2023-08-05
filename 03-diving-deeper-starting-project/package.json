@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "cypress": "concurrently \"npm run dev\" \"cypress open\""
+    "cypress": "concurrently \"npm run dev\" \"cypress open\"",
+    "cy:run": "concurrently \"npm run dev\" \"cypress run\""
   },
   "dependencies": {
     "cypress": "^12.5.1",

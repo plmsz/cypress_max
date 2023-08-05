@@ -66,6 +66,7 @@ data-test
 data-testid
 
 ## disabled
+
 cy.get('[data-cy="contact-btn-submit"]').should("be.disabled")
 cy.get('[data-cy="contact-btn-submit"]').should("not.be.disabled")
 
@@ -73,23 +74,64 @@ cy.get('[data-cy="contact-btn-submit"]').should("not.have.attr", 'disabled')
 cy.get('[data-cy="contact-btn-submit"]').should(".have.attr", 'disabled')
 
 # Chain commands
--  and = should
- cy.get('[data-cy="contact-btn-submit"]')
-      .contains('Send Message')
-      .and('not.have.attr', 'disabled');
+
+- and = should
+  cy.get('[data-cy="contact-btn-submit"]')
+  .contains('Send Message')
+  .and('not.have.attr', 'disabled');
 
 # Alias
+
 cy.get('[data-cy="contact-btn-submit"]').as("submitBtn")
-    cy.get("@submitBtn").click();
-    cy.get("@submitBtn").contains('Sending...');
+cy.get("@submitBtn").click();
+cy.get("@submitBtn").contains('Sending...');
 
 # Then
-  cy.get('[data-cy="contact-btn-submit"]').then((el) => {
-      expect(el.attr('disabled')).to.be.undefined;
-      expect(el.text()).to.eq('Send Message')
-    });
 
+cy.get('[data-cy="contact-btn-submit"]').then((el) => {
+expect(el.attr('disabled')).to.be.undefined;
+expect(el.text()).to.eq('Send Message')
+});
+
+# blur, focus, parent
+
+cypress doens't automatically move the focus to the next input field.
+`cy.get('[data-cy="contact-input-name"]').focus().blur();
+    cy.get('[data-cy="contact-input-name"]').parent().then(el => {
+      expect(el.attr('class')).to.contains('invalid'); 
+    });
+    
+ `
+ # Cy headless
+ cypress run
+ - When fails in the headless cypres use a data atribute to select something
+ - should() is more stable than "then()"
+
+ ## Should - Yields
+  cy.get('nav') // yields <nav>
+  .should('be.visible') // yields <nav>
+
+ In the example below, the second .should() yields the string sans-serif because the chainer have.css, 'font-family' changes the subject.
+
+cy.get('nav') // yields <nav>
+  .should('be.visible') // yields <nav>
+  .should('have.css', 'font-family') // yields 'sans-serif'
+  .and('match', /serif/) // yields 'sans-serif'
+
+  cy.get('[data-cy="contact-input-name"]')
+      .parent()
+      .should('have.attr', 'class')
+      .and('match', /invalid/);
+
+    cy.get('[data-cy="contact-input-email"]').focus().blur();
+    cy.get('[data-cy="contact-input-email"]')
+      .parent()
+      .should((el) => {
+        expect(el.attr('class').contains('invalid'));
+      });
+    cy.screenshot();
 ## Element in order
+
 `cy.get('.task').first().contains("New Task");`
 `cy.get('.task').eq(0).contains("New Task");`
 
@@ -108,20 +150,24 @@ It forces cypress to click in the backdrop, even if that is a textarea in front,
 `cy.get('.modal').should('not.exist')`
 
 # Special keys in type
+
 https://docs.cypress.io/api/commands/type#Arguments
 {esc}
 {enter}
 non native events on cypress : https://github.com/dmtrKovalenko/cypress-real-events
+
 # Location
 
 `cy.location('pathname').should('eq','/about');`
 `cy.go("back");`
 
-
 # Custom Comands
+
 Cypress.Commands.add("getByData", (selector) => {
-  return cy.get(`[data-test=${selector}]`)
+return cy.get(`[data-test=${selector}]`)
 })
 
-
 // TODO: rEAD https://docs.cypress.io/guides/references/best-practices
+
+# Screencshots
+ cy.screenshot();
