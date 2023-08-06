@@ -97,32 +97,37 @@ expect(el.text()).to.eq('Send Message')
 
 cypress doens't automatically move the focus to the next input field.
 `cy.get('[data-cy="contact-input-name"]').focus().blur();
-    cy.get('[data-cy="contact-input-name"]').parent().then(el => {
-      expect(el.attr('class')).to.contains('invalid'); 
-    });
-    
- `
- # Cy headless
- cypress run
- - When fails in the headless cypres use a data atribute to select something
- - should() is more stable than "then()"
+cy.get('[data-cy="contact-input-name"]').parent().then(el => {
+expect(el.attr('class')).to.contains('invalid');
+});
 
- ## Should - Yields
-  cy.get('nav') // yields <nav>
-  .should('be.visible') // yields <nav>
+`
 
- In the example below, the second .should() yields the string sans-serif because the chainer have.css, 'font-family' changes the subject.
+# Cy headless
+
+cypress run
+
+- When fails in the headless cypres use a data atribute to select something
+- should() is more stable than "then()"
+
+## Should - Yields
 
 cy.get('nav') // yields <nav>
-  .should('be.visible') // yields <nav>
-  .should('have.css', 'font-family') // yields 'sans-serif'
-  .and('match', /serif/) // yields 'sans-serif'
+.should('be.visible') // yields <nav>
+
+In the example below, the second .should() yields the string sans-serif because the chainer have.css, 'font-family' changes the subject.
+
+cy.get('nav') // yields <nav>
+.should('be.visible') // yields <nav>
+.should('have.css', 'font-family') // yields 'sans-serif'
+.and('match', /serif/) // yields 'sans-serif'
 
 ### Change of subject
-  cy.get('[data-cy="contact-input-name"]')
-      .parent()
-      .should('have.attr', 'class')
-      .and('match', /invalid/);
+
+cy.get('[data-cy="contact-input-name"]')
+.parent()
+.should('have.attr', 'class')
+.and('match', /invalid/);
 
     cy.get('[data-cy="contact-input-email"]').focus().blur();
     cy.get('[data-cy="contact-input-email"]')
@@ -131,6 +136,7 @@ cy.get('nav') // yields <nav>
         expect(el.attr('class').contains('invalid'));
       });
     cy.screenshot();
+
 ## Element in order
 
 `cy.get('.task').first().contains("New Task");`
@@ -168,52 +174,57 @@ Cypress.Commands.add("getByData", (selector) => {
 return cy.get(`[data-test=${selector}]`)
 })
 Cypress.Commands.add('submitForm', () => {
-  cy.get('form button[type="submit"]').click();
+cy.get('form button[type="submit"]').click();
 });
 Now a query is like a command, but one core difference is that it's a retryable function that can be retried
 by Cypress whilst it's, for example, is waiting for the visibily of the element. The difference is that queries are automatically retried by Cypress whereas commands are not (i.e., if the element is not found initially, Cypress will keep on searching).
 
 Cypress.Commands.addQuery('getById', (id) => {
 const getFn = cy.now('get', `[data-cy="${id}"]`);
-  return () => {
-    return getFn();
-  };
+return () => {
+return getFn();
+};
 });
 
-
 # Screencshots
- cy.screenshot();
 
- # Config
- `https://docs.cypress.io/api/cypress-api/config
+cy.screenshot();
 
- # Baseurl
- import { defineConfig } from "cypress";
+# Config
+
+`https://docs.cypress.io/api/cypress-api/config
+
+# Baseurl
+
+import { defineConfig } from "cypress";
 
 export default defineConfig({
-  e2e: {
-    baseUrl: 'http://localhost:5173',
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
-    },
-  },
+e2e: {
+baseUrl: 'http://localhost:5173',
+setupNodeEvents(on, config) {
+// implement node event listeners here
+},
+},
 });`
 
 ---
+
 `cy.visit('/about')`
 
 # Beforeeach, before, afterEach, after
- beforeEach(() => {
-    //runs only once,before all test
-  })
-  beforeEach(() => {
-    //runs before each test
-    cy.visit('/about');
-  })
+
+beforeEach(() => {
+//runs only once,before all test
+})
+beforeEach(() => {
+//runs before each test
+cy.visit('/about');
+})
 
 // TODO: rEAD https://docs.cypress.io/guides/references/best-practices
 
 # task()
+
 https://docs.cypress.io/api/commands/task#Examples
 https://glebbahmutov.com/blog/powerful-cy-task/
 cy.task() provides an escape hatch for running arbitrary Node code, so you can take actions necessary for your tests outside of the scope of Cypress. This is great for:
@@ -224,3 +235,56 @@ Seeding your test database.
 Storing state in Node that you want persisted between spec files.
 Performing parallel tasks, like making multiple http requests outside of Cypress.
 Running an external process.
+
+# Stubs
+
+- replace for existing functions or methods
+- returns a callback
+  ` cy.visit('/').then((win) => {
+    cy.stub(win.navigator.geolocation, 'getCurrentPosition').as(
+      'getUserPosition',
+    ).callsFake((cb)=>{
+      setTimeout(() => {
+        cb({
+          coords: {
+            latitude: -12.9698108,
+            longitude: -38.5211215,
+          },
+        });
+      }, 100);
+    }); // replace the getCurrentPosition function from the browser
+  });
+  cy.get('[data-cy="get-loc-btn"]').click();
+  cy.get('@getUserPosition').should('have.been.called');`
+- returns a promise
+  cy.stub(win.navigator.clipboard, 'writeText').as('saveToClipboard').resolves()
+
+# Fixtures e regex
+
+- '.\*': This part of the regular expression matches any sequence of characters (except for a newline).
+  cy.fixture('user-location.json').as('userLocation');
+
+cy.get('@userLocation').then((fakePosition) => {
+const { latitude, longitude } = fakePosition.coords;
+cy.get('@saveToClipboard').should(
+'have.been.calledWithMatch',
+new RegExp(`${latitude}.*${longitude}.*${encodeURI('Jane Doe')}`),
+);
+});
+
+# Spy
+
+      cy.spy(win.localStorage, 'setItem').as('storeLocation');
+
+cy.get('@storeLocation').should('have.been.calledWith');
+cy.get('@storeLocation').should(
+'have.been.calledWithMatch',
+/Jane Doe/,
+new RegExp(`${latitude}.*${longitude}.*${encodeURI('Jane Doe')}`),
+);
+
+# Manipulating the clock
+  beforeEach(() => {
+    cy.clock();
+})
+cy.tick(2000); //advance 2 seconds
