@@ -12,3 +12,5 @@ chrome-win.zip
 chrome.zip
 videos/
 screenshots/
+.cache
+build

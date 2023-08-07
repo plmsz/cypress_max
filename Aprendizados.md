@@ -273,7 +273,7 @@ new RegExp(`${latitude}.*${longitude}.*${encodeURI('Jane Doe')}`),
 });
 
 # Spy
-
+Add listener to existing methods
       cy.spy(win.localStorage, 'setItem').as('storeLocation');
 
 cy.get('@storeLocation').should('have.been.calledWith');
@@ -288,3 +288,36 @@ new RegExp(`${latitude}.*${longitude}.*${encodeURI('Jane Doe')}`),
     cy.clock();
 })
 cy.tick(2000); //advance 2 seconds
+
+# Intercept
+To intercept any POST request in newsletter
+`cy.intercept('POST','/newsletter*')`
+
+Block the request with dummy response
+cy.intercept('POST', '/newsletter*', { status: 201 })
+next instruction execute after the fake request
+cy.wait('@subscribe');
+
+Request with a error message
+cy.intercept('POST', '/newsletter*', { message: 'Email exists already' }).as('subscribe');
+
+## Testing the api (backend0 only)
+ cy.request({
+      method: 'POST',
+      url: '/newsletter',
+      body: {
+        email: 'test@example.com',
+      },
+      form: true,
+    }).then((res) => {
+      expect(res.status).to.eq(201);
+    });
+
+# Cookies e its
+its - Get a property's value on the previously yielded subject.
+ cy.getCookie('__session').its('value').should('not.be.empty');
+
+invoke - Invoke a function on the previously yielded subject.
+---
+ cy.intercept('POST', '/takeaways/new*', 'success').as("createTakeaway");
+ cy.wait("@createTakeaway").its('request.body').should('match', /TestTitle.*TestBody/);
